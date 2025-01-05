@@ -1,0 +1,520 @@
+openapi: 3.0.3
+info:
+  title: Nettflix API
+  version: 1.0.0
+  description: API para gestionar películas, reviews y usuarios
+
+paths:
+  /movies:
+    get:
+      summary: Listar todas las películas
+      parameters:
+        - name: genre
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "Action"
+          description: Filtrar películas por género
+      responses:
+        '200':
+          description: Lista de películas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+              examples:
+                movieListExample:
+                  summary: Ejemplo de lista de películas
+                  value:
+                    - id: "c0bf9c05-b18c-4a47-989e-848ea2efd776"
+                      title: "Inception"
+                      director: "Christopher Nolan"
+                      synopsis: "Un ladrón roba secretos corporativos a través del uso de tecnología de sueños compartidos."
+                      releaseDate: "2010-07-16"
+                      genre: "Sci-Fi"
+                    - id: "66190f7f-8adb-4c83-97da-14f764431da1"
+                      title: "The Dark Knight"
+                      director: "Christopher Nolan"
+                      synopsis: "Batman se enfrenta a su nuevo enemigo, el Joker, que siembra caos en la ciudad de Gotham."
+                      releaseDate: "2008-07-18"
+                      genre: "Action"
+
+  /movies/{movieId}:
+    get:
+      summary: Obtener detalles de una película
+      parameters:
+        - name: movieId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "7e438d2d-e4f1-4ec4-9d1f-1d9cac698f13"
+      responses:
+        '200':
+          description: Detalles de la película
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+              examples:
+                movieDetailsExample:
+                  summary: Ejemplo de detalles de película
+                  value:
+                    id: "7e438d2d-e4f1-4ec4-9d1f-1d9cac698f13"
+                    title: "The Shawshank Redemption"
+                    director: "Frank Darabont"
+                    synopsis: "Historia de dos hombres que forjan una amistad en prisión."
+                    releaseDate: "1994-09-23"
+                    genre: "Drama"
+
+  /movies/{movieId}/reviews:
+    get:
+      summary: Listar reviews de una película
+      parameters:
+        - name: movieId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "3e8bc37c-c769-4432-bb09-53fead23d61c"
+      responses:
+        '200':
+          description: Lista de reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+              examples:
+                movieReviewsExample:
+                  summary: Ejemplo de lista de reviews de una película
+                  value:
+                    - id: "ab8b4e57-bdec-477b-b4af-4869ed7f790f"
+                      userId: "f3b5c4c0-0609-472c-ba5e-c38646f8743f"
+                      movieId: "3e8bc37c-c769-4432-bb09-53fead23d61c"
+                      content: "Excelente trama y gran actuación."
+                      score: 9.0
+                      isPublic: true
+                    - id: "9d7c3e18-0d5f-4ae9-8eaa-4c0cc87f1fbe"
+                      userId: "2331fc84-4435-499e-9185-7468130d02ce"
+                      movieId: "3e8bc37c-c769-4432-bb09-53fead23d61c"
+                      content: "Buena película, pero algo larga."
+                      score: 7.5
+                      isPublic: false
+    post:
+      summary: Crear una review para una película
+      parameters:
+        - name: movieId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "3e8bc37c-c769-4432-bb09-53fead23d61c"
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewInput'
+            examples:
+              createReviewExample:
+                summary: Ejemplo de input para crear review
+                value:
+                  content: "Historia entretenida y visualmente espectacular."
+                  isPublic: true
+                  score: 8.5
+      responses:
+        '201':
+          description: Review creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+              examples:
+                createdReviewExample:
+                  summary: Ejemplo de review creada
+                  value:
+                    id: "d575f234-6475-41c3-a59c-a2ab48c6e48f"
+                    userId: "f3b5c4c0-0609-472c-ba5e-c38646f8743f"
+                    movieId: "3e8bc37c-c769-4432-bb09-53fead23d61c"
+                    content: "Historia entretenida y visualmente espectacular."
+                    score: 8.5
+                    isPublic: true
+
+  /movies/reviewed:
+    get:
+      summary: Listar todas las películas sobre las que el usuario autenticado ha escrito reviews
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de películas revisadas por el usuario autenticado
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+              examples:
+                reviewedMoviesExample:
+                  summary: Ejemplo de películas revisadas por usuario
+                  value:
+                    - id: "0416c06d-0b54-4d63-a076-2c6c96e915cc"
+                      title: "Forrest Gump"
+                      director: "Robert Zemeckis"
+                      synopsis: "Un hombre con un CI bajo pero con un gran corazón recorre la historia de EEUU."
+                      releaseDate: "1994-07-06"
+                      genre: "Drama"
+                    - id: "99cf8cf4-99ab-4b66-8afd-fdc65f91363b"
+                      title: "Titanic"
+                      director: "James Cameron"
+                      synopsis: "Historia de un trágico amor a bordo del transatlántico Titanic."
+                      releaseDate: "1997-12-19"
+                      genre: "Romance"
+        '401':
+          description: Usuario no autenticado
+
+  /movies/popular:
+    get:
+      summary: Listar películas por popularidad
+      description: Devuelve una lista de películas ordenadas por el número de reviews o por la media de sus puntuaciones.
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            maximum: 100
+            minimum: 1
+            example: 5
+          description: Número máximo de películas a devolver.
+      responses:
+        '200':
+          description: Lista de películas populares
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+              examples:
+                popularMoviesExample:
+                  summary: Ejemplo de películas populares
+                  value:
+                    - id: "dd14ac5a-0894-4c5f-8a0b-fa4483569d13"
+                      title: "Interstellar"
+                      director: "Christopher Nolan"
+                      synopsis: "Un grupo de astronautas viaja a través de un agujero de gusano para buscar un nuevo hogar para la humanidad."
+                      releaseDate: "2014-11-07"
+                      genre: "Sci-Fi"
+                    - id: "71d93b6a-2d51-442c-8d60-5843cdede5da"
+                      title: "Avengers: Endgame"
+                      director: "Anthony Russo, Joe Russo"
+                      synopsis: "Los superhéroes restantes se unen para revertir el chasquido de Thanos."
+                      releaseDate: "2019-04-26"
+                      genre: "Action"
+        '500':
+          description: Error en el servidor
+
+  /reviews/{reviewId}:
+    patch:
+      summary: Actualizar una review
+      parameters:
+        - name: reviewId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "ab8b4e57-bdec-477b-b4af-4869ed7f790f"
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewUpdateInput'
+            examples:
+              updateReviewExample:
+                summary: Ejemplo de actualización de review
+                value:
+                  content: "Actualizo mi comentario: la película ganó más valor al volverla a ver."
+                  isPublic: false
+                  score: 9
+      responses:
+        '200':
+          description: Review actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+              examples:
+                updatedReviewExample:
+                  summary: Ejemplo de review actualizada
+                  value:
+                    id: "ab8b4e57-bdec-477b-b4af-4869ed7f790f"
+                    userId: "f3b5c4c0-0609-472c-ba5e-c38646f8743f"
+                    movieId: "3e8bc37c-c769-4432-bb09-53fead23d61c"
+                    content: "Actualizo mi comentario: la película ganó más valor al volverla a ver."
+                    score: 9
+                    isPublic: false
+        '404':
+          description: Review no encontrada
+        '403':
+          description: No autorizado para actualizar esta review
+
+    delete:
+      summary: Eliminar una review
+      parameters:
+        - name: reviewId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "ab8b4e57-bdec-477b-b4af-4869ed7f790f"
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Review eliminada
+        '404':
+          description: Review no encontrada
+        '403':
+          description: No autorizado para eliminar esta review
+
+  /auth/signup:
+    post:
+      summary: Registro de un nuevo usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupInput'
+            examples:
+              signupExample:
+                summary: Ejemplo de registro
+                value:
+                  username: "john_doe"
+                  password: "strongPassword123"
+      responses:
+        '201':
+          description: Usuario registrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                userCreatedExample:
+                  summary: Ejemplo de usuario creado
+                  value:
+                    id: "7943e672-f041-4a1a-aa84-b7147f45ed0d"
+                    username: "john_doe"
+
+  /auth/login:
+    post:
+      summary: Inicio de sesión de usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginInput'
+            examples:
+              loginExample:
+                summary: Ejemplo de credenciales de login
+                value:
+                  username: "john_doe"
+                  password: "strongPassword123"
+      responses:
+        '200':
+          description: Inicio de sesión exitoso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+              examples:
+                tokenExample:
+                  summary: Ejemplo de token de acceso
+                  value:
+                    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    type: "Bearer"
+        '401':
+          description: Credenciales inválidas
+
+  /users/{userId}:
+    delete:
+      summary: Eliminar una cuenta de usuario
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "7943e672-f041-4a1a-aa84-b7147f45ed0d"
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Usuario eliminado
+        '404':
+          description: Usuario no encontrado
+
+  /users/{userId}/reviews:
+    get:
+      summary: Listar todas las reviews de un usuario
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "f3b5c4c0-0609-472c-ba5e-c38646f8743f"
+      responses:
+        '200':
+          description: Lista de reviews del usuario
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+              examples:
+                userReviewsExample:
+                  summary: Ejemplo de reviews de un usuario
+                  value:
+                    - id: "ab8b4e57-bdec-477b-b4af-4869ed7f790f"
+                      userId: "f3b5c4c0-0609-472c-ba5e-c38646f8743f"
+                      movieId: "3e8bc37c-c769-4432-bb09-53fead23d61c"
+                      content: "Muy buena experiencia de principio a fin."
+                      score: 8.8
+                      isPublic: true
+                    - id: "9d7c3e18-0d5f-4ae9-8eaa-4c0cc87f1fbe"
+                      userId: "f3b5c4c0-0609-472c-ba5e-c38646f8743f"
+                      movieId: "587cfa4e-13f2-4f6a-b9dd-0cbe0b5ea359"
+                      content: "El final no estuvo a la altura."
+                      score: 6
+                      isPublic: false
+
+components:
+  schemas:
+    Movie:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "ad665c6f-c2be-4c74-a689-0fe5cb988ed4"
+        title:
+          type: string
+          example: "The Matrix"
+        director:
+          type: string
+          example: "Lana Wachowski, Lilly Wachowski"
+        synopsis:
+          type: string
+          example: "Un programador descubre la verdad sobre su realidad y su papel en la guerra contra sus controladores."
+        releaseDate:
+          type: string
+          format: date
+          example: "1999-03-31"
+        genre:
+          type: string
+          example: "Sci-Fi"
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "f14a9c69-213f-405d-8ee7-d2fcaa9e26c8"
+        userId:
+          type: string
+          example: "38012645-54a0-4cc3-9f42-545a8e12b3a7"
+        movieId:
+          type: string
+          example: "ad665c6f-c2be-4c74-a689-0fe5cb988ed4"
+        content:
+          type: string
+          example: "Una obra maestra de la ciencia ficción."
+        score:
+          type: number
+          example: 9.5
+        isPublic:
+          type: boolean
+          example: true
+    ReviewInput:
+      type: object
+      properties:
+        content:
+          type: string
+          example: "Excelentes efectos especiales."
+        isPublic:
+          type: boolean
+          example: false
+        score:
+          type: number
+          maximum: 10
+          minimum: 0
+          example: 7.5
+    ReviewUpdateInput:
+      type: object
+      properties:
+        content:
+          type: string
+          example: "La edición extendida mejora la historia."
+        isPublic:
+          type: boolean
+          example: true
+        score:
+          type: number
+          maximum: 10
+          minimum: 0
+          example: 8
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "660fe2aa-cd66-435d-9851-fbb43358460a"
+        username:
+          type: string
+          example: "john_doe"
+    SignupInput:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "new_user"
+        password:
+          type: string
+          example: "mySecretPassword123"
+    LoginInput:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "john_doe"
+        password:
+          type: string
+          example: "strongPassword123"
+    AuthToken:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Token de acceso para autenticación
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        type:
+          type: string
+          example: "Bearer"
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
