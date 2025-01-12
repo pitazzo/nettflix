@@ -1,0 +1,15 @@
+meta {
+  name: /movies/:movieId
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/movies/:movieId
+  body: none
+  auth: none
+}
+
+params:path {
+  movieId: 
+}

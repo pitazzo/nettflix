@@ -1,0 +1,18 @@
+meta {
+  name: /auth/signup
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/auth/signup
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "",
+    "password": ""
+  }
+}

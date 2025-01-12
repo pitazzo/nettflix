@@ -1,0 +1,27 @@
+meta {
+  name: /movies/:movieId/reviews
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/movies/:movieId/reviews
+  body: json
+  auth: bearer
+}
+
+params:path {
+  movieId: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "content": "",
+    "isPublic": "",
+    "score": ""
+  }
+}

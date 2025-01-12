@@ -1,0 +1,27 @@
+meta {
+  name: /reviews/:reviewId
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{baseUrl}}/reviews/:reviewId
+  body: json
+  auth: bearer
+}
+
+params:path {
+  reviewId: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "content": "",
+    "isPublic": "",
+    "score": ""
+  }
+}

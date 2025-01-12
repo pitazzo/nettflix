@@ -1,0 +1,15 @@
+meta {
+  name: /movies/popular
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/movies/popular
+  body: none
+  auth: none
+}
+
+params:query {
+  ~limit: 
+}

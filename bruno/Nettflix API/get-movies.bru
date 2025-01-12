@@ -1,0 +1,15 @@
+meta {
+  name: /movies
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/movies
+  body: none
+  auth: none
+}
+
+params:query {
+  ~genre: 
+}

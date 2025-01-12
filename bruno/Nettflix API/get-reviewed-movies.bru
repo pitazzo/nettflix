@@ -1,0 +1,15 @@
+meta {
+  name: /movies/reviewed
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/movies/reviewed
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
