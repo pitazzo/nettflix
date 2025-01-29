@@ -8,17 +8,33 @@ import { Repository } from 'typeorm';
 import { Review } from '../entities/review.entity';
 import { CreateReviewDto } from '../dto/review.dto';
 import { UpdateReviewDto } from 'src/modules/movies/dto/update-review.dto';
+import { Movie } from 'src/modules/movies/entities/movie.entity';
 
 @Injectable()
 export class ReviewsService {
   constructor(
     @InjectRepository(Review)
     private reviewRepository: Repository<Review>,
+    @InjectRepository(Movie)
+    private movieRepository: Repository<Movie>,
   ) {}
 
-  async findByMovie(movieId: string): Promise<Review[]> {
+  async findByMovie(movieId: string, userId: string | null): Promise<Review[]> {
+    const movie = await this.movieRepository.findOne({
+      where: { id: movieId },
+    });
+
+    if (!movie) {
+      throw new NotFoundException(`Movie with ID ${movieId} was not found`);
+    }
+
     return this.reviewRepository.find({
-      where: { movie: { id: movieId }, isPublic: true },
+      where: userId
+        ? [
+            { movie: { id: movieId }, isPublic: true },
+            { movie: { id: movieId }, user: { id: userId } },
+          ]
+        : [{ movie: { id: movieId }, isPublic: true }],
       relations: ['user'],
     });
   }
@@ -28,6 +44,14 @@ export class ReviewsService {
     userId: string,
     createReviewDto: CreateReviewDto,
   ): Promise<Review> {
+    const movie = await this.movieRepository.findOne({
+      where: { id: movieId },
+    });
+
+    if (!movie) {
+      throw new NotFoundException(`Movie with ID ${movieId} was not found`);
+    }
+
     const review = this.reviewRepository.create({
       ...createReviewDto,
       movie: { id: movieId },

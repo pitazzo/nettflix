@@ -8,10 +8,15 @@ import { UsersModule } from './modules/users/users.module';
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'db.sqlite',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      type: 'postgres',
+      host: 'nettflix-netfflix.b.aivencloud.com',
+      port: 23219,
+      username: 'avnadmin',
+      password: 'AVNS_Jiqi84gmgNwVGL-pjSA',
+      database: 'defaultdb',
+      autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production',
+      ssl: { rejectUnauthorized: false },
     }),
     MoviesModule,
     UsersModule,

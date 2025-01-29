@@ -26,21 +26,24 @@ export class MoviesService {
   }
 
   async findPopular(limit: number = 10): Promise<Movie[]> {
-    return this.movieRepository
+    return await this.movieRepository
       .createQueryBuilder('movie')
-      .leftJoinAndSelect('movie.reviews', 'review')
-      .addSelect('AVG(review.score)', 'avgScore')
+      .leftJoin('movie.reviews', 'review')
+      .select('movie.id', 'id')
+      .addSelect('movie.title', 'title')
+      .addSelect('COALESCE(AVG(review.score), 0)', 'averageScore')
       .groupBy('movie.id')
-      .orderBy('avgScore', 'DESC')
+      .orderBy('COALESCE(AVG(review.score), 0)', 'DESC')
       .limit(limit)
-      .getMany();
+      .getRawMany();
   }
 
-  async findReviewed(): Promise<Movie[]> {
-    return this.movieRepository
-      .createQueryBuilder('movie')
-      .innerJoinAndSelect('movie.reviews', 'review')
-      .where('review.isPublic = :isPublic', { isPublic: true })
-      .getMany();
+  async findReviewed(userId: string): Promise<Movie[]> {
+    return this.movieRepository.find({
+      where: {
+        reviews: { user: { id: userId } },
+      },
+      relations: ['reviews'],
+    });
   }
 }

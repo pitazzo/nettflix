@@ -15,8 +15,11 @@ export class Movie {
   @Column('text')
   synopsis: string;
 
-  @Column({ type: 'date' })
-  releaseDate: Date;
+  @Column()
+  year: number;
+
+  @Column()
+  country: string;
 
   @Column()
   genre: string;
