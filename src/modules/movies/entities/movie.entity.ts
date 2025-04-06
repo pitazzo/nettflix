@@ -26,4 +26,7 @@ export class Movie {
 
   @OneToMany(() => Review, (review) => review.movie)
   reviews: Review[];
+
+  @Column({ default: 'https://picsum.photos/400/400' })
+  poster: string;
 }
