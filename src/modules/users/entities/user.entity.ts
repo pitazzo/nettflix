@@ -10,6 +10,12 @@ export class User {
   username: string;
 
   @Column()
+  firstName: string;
+
+  @Column()
+  lastName: string;
+
+  @Column()
   password: string;
 
   @OneToMany(() => Review, (review) => review.user)

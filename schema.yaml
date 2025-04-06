@@ -303,6 +303,8 @@ paths:
                 summary: Ejemplo de registro
                 value:
                   username: "john_doe"
+                  firstName: "John"
+                  lastName: "Doe"
                   password: "strongPassword123"
       responses:
         '201':
@@ -317,6 +319,8 @@ paths:
                   value:
                     id: "7943e672-f041-4a1a-aa84-b7147f45ed0d"
                     username: "john_doe"
+                    firstName: "John"
+                    lastName: "Doe"
 
   /auth/login:
     post:
@@ -339,13 +343,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthToken'
+                $ref: '#/components/schemas/LoginResponse'
               examples:
                 tokenExample:
                   summary: Ejemplo de token de acceso
                   value:
                     token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                     type: "Bearer"
+                    profile: {"username": "john_doe", "firstName": "John", "lastName": "Doe"}
+                
         '401':
           description: Credenciales inválidas
 
@@ -485,6 +491,12 @@ components:
         username:
           type: string
           example: "john_doe"
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
     SignupInput:
       type: object
       properties:
@@ -494,6 +506,12 @@ components:
         password:
           type: string
           example: "mySecretPassword123"
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
     LoginInput:
       type: object
       properties:
@@ -503,7 +521,7 @@ components:
         password:
           type: string
           example: "strongPassword123"
-    AuthToken:
+    LoginResponse:
       type: object
       properties:
         token:
@@ -513,6 +531,9 @@ components:
         type:
           type: string
           example: "Bearer"
+        profile:
+          type: object
+          example: {"username": "john_doe", "firstName": "John", "lastName": "Doe"}
   securitySchemes:
     bearerAuth:
       type: http
